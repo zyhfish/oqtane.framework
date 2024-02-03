@@ -124,6 +124,8 @@ namespace Oqtane
             .AddOpenIdConnect(AuthenticationProviderTypes.OpenIDConnect, options => { })
             .AddOAuth(AuthenticationProviderTypes.OAuth2, options => { });
 
+            services.AddOqtaneAuthorization();
+
             services.ConfigureOqtaneCookieOptions();
             services.ConfigureOqtaneAuthenticationOptions(Configuration);
 
