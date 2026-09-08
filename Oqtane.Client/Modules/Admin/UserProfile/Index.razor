@@ -9,7 +9,6 @@
 @inject ISettingService SettingService
 @inject INotificationService NotificationService
 @inject IFileService FileService
-@inject IFolderService FolderService
 @inject ITimeZoneService TimeZoneService
 @inject ILanguageService LanguageService
 @inject IJSRuntime jsRuntime
@@ -75,7 +74,7 @@
                 <div class="row mb-1 align-items-center">
                     <Label Class="col-sm-3" For="@_photofileid.ToString()" HelpText="A photo of yourself" ResourceKey="Photo"></Label>
                     <div class="col-sm-9">
-                        <FileManager FileId="@_photofileid" Filter="@PageState.Site.ImageFiles" ShowFolders="false" ShowFiles="true" UploadMultiple="false" FolderId="@_folderid" @ref="_filemanager" />
+                        <FileManager FileId="@_photofileid" Filter="@PageState.Site.ImageFiles" ShowFolders="false" ShowFiles="true" UploadMultiple="false" FolderId="@PageState.User.FolderId" @ref="_filemanager" />
                     </div>
                 </div>
             </div>
@@ -519,11 +518,7 @@
                 _displayname = PageState.User.DisplayName;
                 _timezoneid = PageState.User.TimeZoneId;     
                 _culturecode = PageState.User.CultureCode;
-                var folder = await FolderService.GetFolderAsync(ModuleState.SiteId, PageState.User.FolderPath);
-                if (folder != null)
-                {
-                    _folderid = folder.FolderId;
-                }
+                _folderid = PageState.User.FolderId;
                 _imagefiles = SettingService.GetSetting(PageState.Site.Settings, "ImageFiles", Constants.ImageFiles);
                 _imagefiles = (string.IsNullOrEmpty(_imagefiles)) ? Constants.ImageFiles : _imagefiles;
                 if (PageState.User.PhotoFileId != null)

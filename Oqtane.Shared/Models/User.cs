@@ -120,6 +120,12 @@ namespace Oqtane.Models
         }
 
         /// <summary>
+        /// The folderid of the user's personal folder
+        /// </summary>
+        [NotMapped]
+        public int FolderId { get; set; }
+
+        /// <summary>
         /// Information if this user's email address is confirmed (set during user creation)
         /// </summary>
         [NotMapped]
@@ -161,6 +167,7 @@ namespace Oqtane.Models
                 IsDeleted = IsDeleted,
                 Password = Password,
                 IsAuthenticated = IsAuthenticated,
+                FolderId = FolderId,
                 EmailConfirmed = EmailConfirmed,
                 SuppressNotification = SuppressNotification,
                 Settings = Settings.ToDictionary(setting => setting.Key, setting => setting.Value)
