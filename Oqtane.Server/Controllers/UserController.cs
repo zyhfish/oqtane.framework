@@ -145,6 +145,7 @@ namespace Oqtane.Controllers
                     filtered.TwoFactorRequired = user.TwoFactorRequired;
                     filtered.EmailConfirmed = user.EmailConfirmed;
                     filtered.Roles = user.Roles;
+                    filtered.FolderId = user.FolderId;
                     filtered.CreatedBy = user.CreatedBy;
                     filtered.CreatedOn = user.CreatedOn;
                     filtered.ModifiedBy = user.ModifiedBy;

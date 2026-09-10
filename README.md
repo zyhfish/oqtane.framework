@@ -12,7 +12,7 @@ Oqtane is being developed based on some fundamental principles which are outline
 
 # Latest Release
 
-[10.2.4](https://github.com/oqtane/oqtane.framework/releases/tag/v10.2.4) was released on August 17, 2026.
+[10.2.5](https://github.com/oqtane/oqtane.framework/releases/tag/v10.2.5) was released on September 10, 2026.
 
 # Try It Now!
 
@@ -114,6 +114,9 @@ This project is open source, and therefore is a work in progress...
 Backlog
 - [ ] Folder Providers
 - [ ] Native MCP Server
+
+[10.2.5](https://github.com/oqtane/oqtane.framework/releases/tag/v10.2.5) (Sep 10, 2026)
+- [x] Stabilization improvements
 
 [10.2.4](https://github.com/oqtane/oqtane.framework/releases/tag/v10.2.4) (Aug 17, 2026)
 - [x] Stabilization improvements
