@@ -20,7 +20,7 @@ namespace Oqtane.Migrations.Tenant
             folderProviderEntityBuilder.Create();
 
             var folderEntityBuilder = new FolderEntityBuilder(migrationBuilder, ActiveDatabase);
-            folderEntityBuilder.AddIntegerColumn("FolderConfigId", false, 0);
+            folderEntityBuilder.AddIntegerColumn("FolderConfigId", true);
             folderEntityBuilder.AddStringColumn("MappedPath", 512, true);
             folderEntityBuilder.AddForeignKey("FK_Folder_FolderConfig", "FolderConfigId", "FolderConfig", "FolderConfigId", ReferentialAction.NoAction);
         }
