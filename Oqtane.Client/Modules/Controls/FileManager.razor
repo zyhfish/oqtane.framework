@@ -530,16 +530,28 @@
                     {
                         // verify file was uploaded (it may have been removed if folder exceeded capacity)
                         FileId = -1;
-                        if (Folder != Constants.PackagesFolder && !AnonymizeUploadFilenames)
+                        if (Folder != Constants.PackagesFolder)
                         {
-                            // get first file in upload collection (removing ":size" suffix)
-                            var file = await FileService.GetFileAsync(int.Parse(folder), uploads[0].Substring(0, uploads[0].LastIndexOf(":")));
-                            if (file != null)
+                            if (!AnonymizeUploadFilenames)
                             {
-                                FileId = file.FileId;
+                                // retrieve first file in upload collection (removing ":size" suffix)
+                                var file = await FileService.GetFileAsync(int.Parse(folder), uploads[0].Substring(0, uploads[0].LastIndexOf(":")));
+                                if (file != null)
+                                {
+                                    FileId = file.FileId;
+                                }
+                            }
+                            else
+                            {
+                                // when anonymizing file names we need to get the most recent file uploaded
+                                var files = await FileService.GetFilesAsync(int.Parse(folder));
+                                if (files.Any())
+                                {
+                                    FileId = files.OrderByDescending(item => item.CreatedOn).First().FileId;
+                                }
                             }
                         }
-                        if (FileId != -1 || (Folder == Constants.PackagesFolder || AnonymizeUploadFilenames))
+                        if (FileId != -1 || Folder == Constants.PackagesFolder)
                         {
                             await logger.LogInformation("File Upload Succeeded {Files}", uploads);
                             if (ShowSuccess)
