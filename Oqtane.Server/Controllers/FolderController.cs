@@ -1,22 +1,17 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using Azure;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Oqtane.Enums;
 using Oqtane.Extensions;
 using Oqtane.Infrastructure;
+using Oqtane.Managers;
 using Oqtane.Models;
+using Oqtane.Providers;
 using Oqtane.Repository;
 using Oqtane.Security;
-using System;
-using Oqtane.Providers;
-using System.Threading.Tasks;
-using Oqtane.Managers;
 using Oqtane.Shared;
 
 namespace Oqtane.Controllers
@@ -44,8 +39,8 @@ namespace Oqtane.Controllers
             IFolderManager folderManager,
             ISyncManager syncManager,
             ILogManager logger,
-            ITenantManager tenantManager)
-        public FolderController(IFolderRepository folders, IUserPermissions userPermissions, IFileRepository files, IPermissionRepository permissionRepository, ISyncManager syncManager, ILogManager logger, ITenantManager tenantManager)
+            ITenantManager tenantManager,
+            IPermissionRepository permissionRepository)
         {
             _folderProviderFactory = folderProviderFactory;
             _folders = folders;
