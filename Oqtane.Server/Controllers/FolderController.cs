@@ -1,20 +1,23 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Oqtane.Models;
-using Oqtane.Shared;
 using System.Linq;
 using System.Net;
+using Azure;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Oqtane.Enums;
 using Oqtane.Extensions;
 using Oqtane.Infrastructure;
+using Oqtane.Models;
 using Oqtane.Repository;
 using Oqtane.Security;
 using System;
 using Oqtane.Providers;
 using System.Threading.Tasks;
 using Oqtane.Managers;
+using Oqtane.Shared;
 
 namespace Oqtane.Controllers
 {
@@ -27,6 +30,7 @@ namespace Oqtane.Controllers
         private readonly IUserPermissions _userPermissions;
         private readonly IFileRepository _files;
         private readonly IFolderManager _folderManager;
+        private readonly IPermissionRepository _permissionRepository;
         private readonly ISyncManager _syncManager;
         private readonly ILogManager _logger;
         private readonly Alias _alias;
@@ -41,6 +45,7 @@ namespace Oqtane.Controllers
             ISyncManager syncManager,
             ILogManager logger,
             ITenantManager tenantManager)
+        public FolderController(IFolderRepository folders, IUserPermissions userPermissions, IFileRepository files, IPermissionRepository permissionRepository, ISyncManager syncManager, ILogManager logger, ITenantManager tenantManager)
         {
             _folderProviderFactory = folderProviderFactory;
             _folders = folders;
@@ -48,6 +53,7 @@ namespace Oqtane.Controllers
             _userPermissions = userPermissions;
             _files = files;
             _folderManager = folderManager;
+            _permissionRepository = permissionRepository;
             _syncManager = syncManager;
             _logger = logger;
             _alias = tenantManager.GetAlias();
@@ -259,10 +265,10 @@ namespace Oqtane.Controllers
                         }
 
                         folder.Path = Utilities.UrlCombine(parent.Path, folder.Name);
-                    }
-                    if (!folder.Path.EndsWith("/"))
-                    {
-                        folder.Path = folder.Path + "/";
+                        if (!folder.Path.EndsWith("/"))
+                        {
+                            folder.Path = folder.Path + "/";
+                        }
                     }
 
                     var _folder = _folders.GetFolder(id, false);
@@ -281,6 +287,12 @@ namespace Oqtane.Controllers
 
                     _syncManager.AddSyncEvent(_alias, EntityNames.Folder, folder.FolderId, SyncEventActions.Update);
                     _logger.Log(LogLevel.Information, this, LogFunction.Update, "Folder Updated {Folder}", folder);
+
+                    if (folder.UpdateSubfolderPermissions)
+                    {
+                        UpdateSubfoldersRecursively(folder.SiteId, folder.FolderId);
+                        _logger.Log(LogLevel.Information, this, LogFunction.Update, "Subfolder Permissions Updated {Folder}", folder);
+                    }
                 }
                 else
                 {
@@ -297,6 +309,39 @@ namespace Oqtane.Controllers
             }
 
             return folder;
+        }
+
+        private void UpdateSubfoldersRecursively(int siteId, int parentId)
+        {
+            var permissions = _permissionRepository.GetPermissions(siteId, EntityNames.Folder, parentId).ToList();
+
+            foreach (var subfolder in _folders.GetFolders(siteId).Where(item => item.ParentId == parentId).ToList())
+            {
+                // remove existing permissions
+                _permissionRepository.DeletePermissions(siteId, EntityNames.Folder, subfolder.FolderId);
+
+                // add parent permissions
+                foreach (Permission permission in permissions)
+                {
+                    _permissionRepository.AddPermission(new Permission
+                    {
+                        SiteId = siteId,
+                        EntityName = EntityNames.Folder,
+                        EntityId = subfolder.FolderId,
+                        PermissionName = permission.PermissionName,
+                        RoleId = permission.RoleId,
+                        UserId = permission.UserId,
+                        IsAuthorized = permission.IsAuthorized
+                    });
+                }
+
+                _syncManager.AddSyncEvent(_alias, EntityNames.Folder, subfolder.FolderId, SyncEventActions.Update);
+
+                if (_folders.GetFolders(siteId).Where(item => item.ParentId == subfolder.FolderId).Any())
+                {
+                    UpdateSubfoldersRecursively(siteId, subfolder.FolderId);
+                }
+            }
         }
 
         // DELETE api/<controller>/5
