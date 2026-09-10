@@ -276,7 +276,7 @@
             else
             {
                 _folderConfigEditable = true;
-                _folderTypeEditable = true;
+                _folderTypeEditable = false;
                 _folderConfigId = await FolderConfigService.GetDefaultConfigIdAsync();
 
                 if (PageState.QueryString.ContainsKey("parentid"))
@@ -287,6 +287,9 @@
                 {
                     _parentId = _folders[0].FolderId;
                 }
+
+                OnParentChanged(_parentId);
+
                 await LoadParent();     
             }
 
@@ -471,7 +474,7 @@
         if (parentFolder != null)
         {
             _folderConfigEditable = parentFolder.FolderConfig.Provider == Constants.DefaultFolderProvider;
-
+            _folderConfigId = parentFolder.FolderConfig.FolderConfigId;
             OnConfigChanged(parentFolder.FolderConfigId);
         }
     }
