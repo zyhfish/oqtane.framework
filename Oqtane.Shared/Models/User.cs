@@ -43,11 +43,6 @@ namespace Oqtane.Models
         public string CultureCode { get; set; }
 
         /// <summary>
-        /// Reference to a <see cref="File"/> containing the users photo.
-        /// </summary>
-        public int? PhotoFileId { get; set; }
-
-        /// <summary>
         /// Timestamp of last login.
         /// </summary>
         public DateTime? LastLoginOn { get; set; }
@@ -124,6 +119,27 @@ namespace Oqtane.Models
         /// </summary>
         [NotMapped]
         public int FolderId { get; set; }
+
+        /// <summary>
+        /// Reference to a <see cref="File"/> containing the users photo.
+        /// </summary>
+        [NotMapped]
+        public int? PhotoFileId
+        {
+            get
+            {
+                if (Settings != null && Settings.ContainsKey($"PhotoFileId:{SiteId}") && int.TryParse(Settings[$"PhotoFileId:{SiteId}"].Replace("[Public]", "").Replace("[Private]", ""), out int photoFileId))
+                {
+                    return photoFileId;
+                }
+                return null;
+            }
+            set
+            {
+                // not implemented (retained for backward compatibility)
+                // note that the PhotoFileId column in the User database table still exists and the legacy data can be manually migrated to the Setting table if required
+            }
+        }
 
         /// <summary>
         /// Information if this user's email address is confirmed (set during user creation)
