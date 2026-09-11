@@ -98,7 +98,7 @@ namespace Oqtane.Managers
                     }
                     user.Settings = _settings.GetSettings(EntityNames.User, user.UserId)
                         .ToDictionary(setting => setting.SettingName, setting => setting.SettingValue);
-                    var folder = _folders.GetFolder(siteid, user.FolderPath);
+                    var folder = _folders.GetFolder(siteid, user.FolderPath, user.UserId);
                     user.FolderId = (folder != null) ? folder.FolderId : -1;
                 }
                 return user;
